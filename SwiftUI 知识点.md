@@ -25,4 +25,11 @@
 
   extension CalculatorButtonItem: Hashable {}
 
-- 
+
+
+
+
+## @state数据状态驱动界面
+
+- @state
+  - 和一般的存储属性不同，@state修饰的值，在SwiftUI内部会被自动转换为一对setter和getter，对这个属性进行赋值的操作将会触发View的刷新，它的body会被再次调用，底层渲染引擎会找出界面上被改变的部分，根据新的属性值计算出新的View，并进行刷新。

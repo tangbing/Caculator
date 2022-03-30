@@ -10,17 +10,24 @@ import SwiftUI
 let scale: CGFloat = UIScreen.main.bounds.width / 414
 
 struct ContentView: View {
-        
+    
+    //@State private var brain: CaculatorBrain = .left("0")
+    @ObservedObject var model = CaculatorModel()
+    
     var body: some View {
         VStack(spacing: 12) {
             Spacer() /// SwiftUI 允许我们定义可伸缩的空白：Spacer，它会尝试将可占据的空间全部填满
-            Text("0")
+            Text(model.brain.output)
                 .font(.system(size: 76))
                 .minimumScaleFactor(0.5)
-                .padding(.trailing, 24)
+                .padding(.trailing, 24 * scale)
                 .lineLimit(1)
                 .frame(minWidth: 0, maxWidth: .infinity,  alignment: .trailing)
-            CaculatorButtonPad()
+            Button("Test") {
+                print("Test")
+               // self.brain = .left("1.23")
+            }
+            CaculatorButtonPad(brain: $model.brain)
                 .padding(.bottom)
         }
         .scaleEffect(scale)
@@ -45,12 +52,7 @@ struct CaculatorButton: View {
 
     
     var body: some View {
-//        ZStack {
-//            Circle()
-//            Text(title)
-//        }
-        
-        
+
         Button(action: action) {
             Text(title)
                 .foregroundColor(.white)
@@ -64,12 +66,17 @@ struct CaculatorButton: View {
 }
 
 struct CaculatorButtonRow: View {
+    
+    @Binding var brain: CaculatorBrain
+
+    
     let row: [CaculatorButtonItem]
     var body: some View {
         HStack {
             ForEach(row, id:\.self) {item in
                 CaculatorButton(title: item.title, size: item.size, backgroundColorName: item.backgroundColorName) {
                     print("Button:\(item.title)")
+                    self.brain =  self.brain.apply(item: item)
                 }
             }
         }
@@ -77,7 +84,8 @@ struct CaculatorButtonRow: View {
 }
 
 struct CaculatorButtonPad: View {
-    
+    @Binding var brain: CaculatorBrain
+
     let pad: [[CaculatorButtonItem]] = [
         [.command(.clear), .command(.flip),
         .command(.percent), .op(.divide)],
@@ -90,7 +98,7 @@ struct CaculatorButtonPad: View {
     var body: some View {
         VStack(spacing: 8) {
             ForEach(pad, id:\.self) { row in
-                CaculatorButtonRow(row: row)
+                CaculatorButtonRow(brain: self.$brain, row: row)
             }
         }
     }
